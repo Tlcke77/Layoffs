@@ -1,18 +1,21 @@
 # Layoffs
 
 ## 📚 Table of Contents
-- [Business Task](#business-task)
-- [Data Cleaning and Transformation](#-data-cleaning--transformation)
-- [A. Pizza Metrics](#a-pizza-metrics)
-- [B. Runner and Customer Experience](#b-runner-and-customer-experience)
-- [C. Ingredient Optimisation](#c-ingredient-optimisation)
-- [D. Pricing and Ratings](#d-pricing-and-ratings)
+- [About the Dataset](#about-the-dataset)
+- [Data Cleaning & Transformation](#-data-cleaning--transformation)
+  - [Step 1: Create a Staging Table](#step-1-create-a-staging-table)
+  - [Step 2: Remove Duplicates](#step-2-remove-duplicates)
+  - [Step 3: Standardize the data](#step-3-standardize-the-data)
+  - [Step 4: Null Values or Blank Values](#step-4-null-values-or-blank-values)
+  - [Step 5: Remove Any Columns](#step-5-remove-any-columns)
 
-Please note that all the information regarding the case study has been sourced from the following link: [here](https://8weeksqlchallenge.com/case-study-2/).
+Please note that the data has been sourced from the following link: [here](https://www.kaggle.com/datasets/swaptr/layoffs-2022).
 
 ***
 
-## Business Task
+## About the Dataset
+
+This project uses a dataset that tracks recent tech layoffs, sourced from platforms like Bloomberg, San Francisco Business Times, TechCrunch, and The New York Times. 
 
 ## 🧼 Data Cleaning & Transformation
 
@@ -46,7 +49,7 @@ WHERE row_num > 1
 ;
 `````
 - We have identified two potential companies Beyond Meat and Cazoo
-PICTURE
+<img src="https://github.com/Tlcke77/pics/blob/main/Capture.PNG" alt="Image" width="800" height="55">
 
 - Next, we can furhter this by looking into the entries into this dataset for each of the companies to determine their status as a dublicate.
   - Cazoo
@@ -57,21 +60,21 @@ PICTURE
     ;
     `````
       - A dublicate is confirmed here found in the last two rows.
-      - PICTURE\
+<img src="https://github.com/Tlcke77/pics/blob/main/Capture%202.PNG" alt="Image" width="704" height="69">
 
   - Beyond Meat
-   ````sql
-    SELECT *
-    FROM layoff_staging
-    WHERE company = 'Cazoo'
-    ;
-    `````
-     - A dublicate is confirmed here found in the sencond row.
-      - PICTURE\
+````sql
+SELECT *
+FROM layoff_staging
+WHERE company = 'Cazoo'
+;
+````
+- A dublicate is confirmed here found in the sencond row.
+<img src="https://github.com/Tlcke77/pics/raw/main/Capture%203.PNG" alt="Image" width="704" height="69">
 
 - Further, we'll create another Staging table so we can filer on the row_num
 ````sql
-    CREATE TABLE `layoff_staging` (
+  CREATE TABLE `layoff_staging` (
   `company` text,
   `location` text,
   `industry` text,
@@ -83,7 +86,7 @@ PICTURE
   `funds_raised` text,
   `row_num` INT -- Add row_num
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-`````
+````
 
 ````sql
   INSERT INTO layoff_staging2
@@ -91,7 +94,7 @@ PICTURE
   row_number() OVER (PARTITION BY company, location, industry, total_laid_off, percentage_laid_off, `date`, stage, country, funds_raised) AS row_num
   FROM layoff_staging
   ;
-`````
+````
 
 - Finally, we can delete the dublicate rows
 ````sql
@@ -99,7 +102,7 @@ DELETE
 FROM layoff_staging2
 WHERE row_num > 1
 ;
-`````
+````
 
 ### Step 3: Standardize the data
 
@@ -109,7 +112,7 @@ SELECT company, TRIM(company)
 FROM layoff_staging2
 ;
 `````
-- PICTURE
+<img src="https://github.com/Tlcke77/pics/blob/main/Capture%204.PNG" alt="Image" width="188" height="136">
 
 - Apply trim
 ````sql
@@ -169,6 +172,57 @@ SET company = TRIM(company)
   ;
   `````
 
+### Step 4: Null Values or Blank Values
 
-### Step 4: Null Values or blank values
+- The blank space I looked at where in the Indusrty column and here I indentified one blank value. It was with the company called "Appsmith". Out the avalible indusrty used in the dataset I felt that it fell best under the 'Other' category.
+  ````sql
+  SELECT *
+  FROM layoff_staging2
+  WHERE industry IS NULL 
+  OR industry = ''
+  ;
+  `````
+
+  ````sql
+  UPDATE layoff_staging2
+  SET industry = 'Other'
+  WHERE industry = ''
+  ;
+  ````` 
+- Then I looked at the location column and found a blank column for the company "Product Hunt".
+  ````sql
+  SELECT *
+  FROM layoff_staging2
+  WHERE location IS NULL 
+  OR location = ''
+  ;
+  `````
+  
+  ````sql
+  UPDATE layoff_staging2
+  SET location = 'SF Bay Area'
+  WHERE location = ''
+  ;
+  `````
+:grey_exclamation: Discalmier there is still some blank values in the total_laid_off, percentage_laid_off, stage, and funds_raised because I fell like its not possible to populate the values with data due to the data availbe with the dataset. :grey_exclamation:
+
 ### Step 5: Remove Any Columns
+
+:grey_exclamation: This section is completely option and is based on your goal for the dataset. :grey_exclamation:
+
+- I'm cleaning this dateset with the goal of performing some exploaratory data analaysis. So with that said I will be removing columns where total_laid_off and percentage_laid_off are blank becuase they service no additonal value to me in my future process with my future data analysis.
+  
+ ````sql
+  DELETE
+  FROM layoff_staging2
+  WHERE percentage_laid_off = ''
+  AND total_laid_off = ''
+  ;
+  `````
+
+- Then I no longer need the row_num column as well.
+ ````sql
+  ALTER TABLE layoff_staging2
+  DROP COLUMN row_num
+  ;
+  ````` 
