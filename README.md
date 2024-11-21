@@ -10,6 +10,7 @@
   - [Step 5: Remove Any Columns](#step-5-remove-any-columns)
 
 Please note that the data has been sourced from the following link: [here](https://www.kaggle.com/datasets/swaptr/layoffs-2022).
+:grey_exclamation: This dataset is constantly being updated, so results may vary.  :grey_exclamation:
 
 ***
 
@@ -72,7 +73,7 @@ WHERE company = 'Cazoo'
 - A duplicate is confirmed here found in the sencond row.
 <img src="https://github.com/Tlcke77/pics/raw/main/Capture%203.PNG" alt="Image" width="704" height="69">
 
-- Further, we'll create another Staging table so we can filter on the row_num
+- Further, we'll create another staging table so we can filter on the row_num
 ````sql
   CREATE TABLE `layoff_staging` (
   `company` text,
