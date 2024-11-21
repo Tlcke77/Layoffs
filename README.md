@@ -10,6 +10,7 @@
   - [Step 5: Remove Any Columns](#step-5-remove-any-columns)
 
 Please note that the data has been sourced from the following link: [here](https://www.kaggle.com/datasets/swaptr/layoffs-2022).
+
 :grey_exclamation: This dataset is constantly being updated, so results may vary.  :grey_exclamation:
 
 ***
