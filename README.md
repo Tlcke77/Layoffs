@@ -35,23 +35,23 @@ FROM layoffs
 
 ### Step 2: Remove Duplicates
 
-- First we need to identify possivle duplicates within the dataset. This can be done by assiging each entry a `row_number`.
+- First we need to identify possible duplicates within the dataset. This can be done by assigning each entry a `row_number`.
 ````sql
-WITH dublicate_cte AS
+WITH duplicate_cte AS
 (
 SELECT *, 
 row_number() OVER (PARTITION BY company, location, industry, total_laid_off, percentage_laid_off, `date`, stage, country, funds_raised) AS row_num
 FROM layoff_staging
 )
 SELECT *
-FROM dublicate_cte
+FROM duplicate_cte
 WHERE row_num > 1
 ;
 `````
 - We have identified two potential companies Beyond Meat and Cazoo
 <img src="https://github.com/Tlcke77/pics/blob/main/Capture.PNG" alt="Image" width="800" height="55">
 
-- Next, we can furhter this by looking into the entries into this dataset for each of the companies to determine their status as a dublicate.
+- Next, we can further this by looking into the entries into this dataset for each of the companies to determine their status as a duplicate.
   - Cazoo
     ````sql
     SELECT *
@@ -59,7 +59,7 @@ WHERE row_num > 1
     WHERE company = 'Cazoo'
     ;
     `````
-      - A dublicate is confirmed here found in the last two rows.
+      - A duplicate is confirmed here found in the last two rows.
 <img src="https://github.com/Tlcke77/pics/blob/main/Capture%202.PNG" alt="Image" width="704" height="69">
 
   - Beyond Meat
@@ -69,10 +69,10 @@ FROM layoff_staging
 WHERE company = 'Cazoo'
 ;
 ````
-- A dublicate is confirmed here found in the sencond row.
+- A duplicate is confirmed here found in the sencond row.
 <img src="https://github.com/Tlcke77/pics/raw/main/Capture%203.PNG" alt="Image" width="704" height="69">
 
-- Further, we'll create another Staging table so we can filer on the row_num
+- Further, we'll create another Staging table so we can filter on the row_num
 ````sql
   CREATE TABLE `layoff_staging` (
   `company` text,
@@ -96,7 +96,7 @@ WHERE company = 'Cazoo'
   ;
 ````
 
-- Finally, we can delete the dublicate rows
+- Finally, we can delete the duplicate rows
 ````sql
 DELETE
 FROM layoff_staging2
@@ -174,7 +174,7 @@ SET company = TRIM(company)
 
 ### Step 4: Null Values or Blank Values
 
-- The blank space I looked at where in the Indusrty column and here I indentified one blank value. It was with the company called "Appsmith". Out the avalible indusrty used in the dataset I felt that it fell best under the 'Other' category.
+- The blank space I looked at where in the Industry column and here I indentified one blank value. It was with the company called "Appsmith". Out of the available industry options used in the dataset I felt that it fell best under the 'Other' category.
   ````sql
   SELECT *
   FROM layoff_staging2
