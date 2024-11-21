@@ -1,4 +1,4 @@
-# Layoffs
+# Tech Layoffs
 
 ## 📚 Table of Contents
 - [About the Dataset](#about-the-dataset)
